@@ -92,6 +92,28 @@ app.post("/updateProduct", async (req, res) => {
   }
 });
 
+app.post("/addImages", upload.array("images"), async (req, res) => {
+  const { _id } = req.body;
+  let images = [];
+  const imageData = req.files;
+
+  for (let x = 0; x < imageData.length; x++) {
+    images.push(imageData[x].filename);
+  }
+
+  try {
+    const update = await Product.findByIdAndUpdate(
+      { _id },
+      { $push: { images: { $each: images } } }
+    );
+
+    console.log(update);
+    res.json({ msg: true });
+  } catch (err) {
+    res.json({ msg: false });
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server is up on port 3001");
 });
