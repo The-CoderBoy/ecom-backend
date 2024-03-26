@@ -12,7 +12,6 @@ const rootFolder = __dirname;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
 app.use(cors());
 app.use(express.static("public"));
 
@@ -110,6 +109,42 @@ app.post("/addImages", upload.array("images"), async (req, res) => {
     console.log(update);
     res.json({ msg: true });
   } catch (err) {
+    res.json({ msg: false });
+  }
+});
+
+app.post("/deleteProduct", async (req, res) => {
+  const { _id } = req.body;
+  try {
+    const product = await Product.findById({ _id });
+
+    if (product.images.length) {
+      for (let x = 0; x < product.images.length; x++) {
+        const filePath = path.join(
+          rootFolder,
+          "public",
+          "image",
+          product.images[x]
+        );
+
+        fs.unlink(filePath, (err) => console.log(err));
+      }
+    }
+
+    const deleteProduct = await Product.findByIdAndDelete({ _id });
+    console.log(deleteProduct);
+    res.json({ msg: true });
+  } catch (err) {
+    console.log(err);
+    res.json({ msg: false });
+  }
+});
+
+app.post("/adminLogin", async (req, res) => {
+  const { userName, password } = req.body;
+  if (userName == "admin" && password == "admin") {
+    res.json({ msg: true });
+  } else {
     res.json({ msg: false });
   }
 });
