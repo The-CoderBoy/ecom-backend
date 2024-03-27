@@ -8,6 +8,12 @@ const product = new mongoose.Schema({
   images: [String],
 });
 
-const Product = mongoose.model("Product", product);
+const banner = new mongoose.Schema({
+  _id: String,
+  images: [String],
+});
 
-module.exports = { Product };
+const Product = mongoose.model("Product", product);
+const Banner = mongoose.model("Banner", banner);
+
+module.exports = { Product, Banner };

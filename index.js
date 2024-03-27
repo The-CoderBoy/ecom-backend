@@ -24,7 +24,7 @@ async function main() {
   console.log("database connnected");
 }
 
-const { Product } = require("./db/db");
+const { Product, Banner } = require("./db/db");
 
 //---------------Routes------------------
 
@@ -147,6 +147,37 @@ app.post("/adminLogin", async (req, res) => {
   } else {
     res.json({ msg: false });
   }
+});
+
+app.post("/addBanner", upload.array("images"), async (req, res) => {
+  let images = [];
+  const imageData = req.files;
+
+  for (let x = 0; x < imageData.length; x++) {
+    images.push(imageData[x].filename);
+  }
+
+  try {
+    const ban = await Banner.findById({ _id: "banner" });
+    if (ban) {
+      const update = await Banner.findByIdAndUpdate(
+        { _id: "banner" },
+        { $push: { images: { $each: images } } }
+      );
+      console.log(update);
+    } else {
+      const addImage = await Banner.create({ _id: "banner", images: images });
+      console.log(addImage);
+    }
+    res.json({ msg: true });
+  } catch (err) {
+    res.json({ msg: false });
+  }
+});
+
+app.post("/viewBanner", async (req, res) => {
+  const data = await Banner.findById({ _id: "banner" });
+  res.json(data);
 });
 
 app.listen(3001, () => {
