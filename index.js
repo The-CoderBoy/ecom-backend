@@ -24,7 +24,7 @@ async function main() {
   console.log("database connnected");
 }
 
-const { Product, Banner } = require("./db/db");
+const { Product, Banner, User } = require("./db/db");
 
 //---------------Routes------------------
 
@@ -178,6 +178,41 @@ app.post("/addBanner", upload.array("images"), async (req, res) => {
 app.post("/viewBanner", async (req, res) => {
   const data = await Banner.findById({ _id: "banner" });
   res.json(data);
+});
+
+app.post("/deleteBanner", async (req, res) => {
+  const { remainImage, delImage } = req.body;
+
+  try {
+    const data = await Banner.findOneAndReplace(
+      { _id: "banner" },
+      { images: remainImage }
+    );
+
+    if (delImage.length) {
+      for (let x = 0; x < delImage.length; x++) {
+        const filePath = path.join(rootFolder, "public", "image", delImage[x]);
+
+        fs.unlink(filePath, (err) => console.log(err));
+      }
+    }
+
+    res.json({ msg: true });
+  } catch (err) {
+    res.json({ msg: false });
+  }
+});
+
+app.post("/addUser", async (req, res) => {
+  const data = req.body;
+  try {
+    const addData = await User.create(data);
+    console.log(addData);
+    res.json({ msg: true });
+  } catch (err) {
+    console.log(err);
+    res.json({ msg: false });
+  }
 });
 
 app.listen(3001, () => {
