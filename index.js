@@ -215,6 +215,52 @@ app.post("/addUser", async (req, res) => {
   }
 });
 
+app.post("/userLogin", async (req, res) => {
+  const { userName, password } = req.body;
+  try {
+    const data = await User.findOne({ userName: userName });
+    if (data && data.password == password) {
+      res.json(data);
+    } else {
+      res.json(false);
+    }
+  } catch (err) {
+    res.json(false);
+  }
+});
+
+app.post("/userDetail", async (req, res) => {
+  const { userName } = req.body;
+  try {
+    const data = await User.findOne({ userName: userName });
+    if (data) {
+      res.json(data);
+    } else {
+      res.json(false);
+    }
+  } catch (err) {
+    res.json(false);
+  }
+});
+
+app.post("/updateUser", async (req, res) => {
+  const data = req.body;
+  let obj = data;
+  delete obj._id;
+
+  try {
+    const update = await User.findOneAndReplace(
+      { userName: obj.userName },
+      obj
+    );
+    console.log(update);
+    res.json({ msg: true });
+  } catch (err) {
+    console.log(err);
+    res.json({ msg: false });
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server is up on port 3001");
 });
