@@ -20,8 +20,21 @@ const user = new mongoose.Schema({
   address: String,
 });
 
+const cart = new mongoose.Schema({
+  _id: String,
+  productDetails: [
+    {
+      productId: String,
+      productName: String,
+      quantity: String,
+      price: String,
+    },
+  ],
+});
+
 const Product = mongoose.model("Product", product);
 const Banner = mongoose.model("Banner", banner);
 const User = mongoose.model("User", user);
+const Cart = mongoose.model("Cart", cart);
 
-module.exports = { Product, Banner, User };
+module.exports = { Product, Banner, User, Cart };

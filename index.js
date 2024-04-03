@@ -24,7 +24,7 @@ async function main() {
   console.log("database connnected");
 }
 
-const { Product, Banner, User } = require("./db/db");
+const { Product, Banner, User, Cart } = require("./db/db");
 
 //---------------Routes------------------
 
@@ -258,6 +258,72 @@ app.post("/updateUser", async (req, res) => {
   } catch (err) {
     console.log(err);
     res.json({ msg: false });
+  }
+});
+
+app.post("/addToCart", async (req, res) => {
+  const { userName, productName, productId, quantity, price } = req.body;
+
+  try {
+    const cart = await Cart.findOne({ _id: userName });
+    if (cart) {
+      const isItemPresent = await Cart.findOne({
+        "productDetails.productId": productId,
+      });
+
+      if (isItemPresent) {
+        const updateCart = await Cart.findOneAndUpdate(
+          { "productDetails.productId": productId },
+          { $set: { "productDetails.$.quantity": quantity } }
+        );
+        res.json({ msg: true });
+        console.log(updateCart);
+      } else {
+        const addInCart = await Cart.findOneAndUpdate(
+          { _id: userName },
+          {
+            $push: {
+              productDetails: {
+                productId: productId,
+                productName: productName,
+                quantity: quantity,
+                price: price,
+              },
+            },
+          }
+        );
+        console.log(addInCart);
+        res.json({ msg: true });
+      }
+    } else {
+      const createCart = await Cart.create({
+        _id: userName,
+        productDetails: [
+          {
+            productId: productId,
+            productName: productName,
+            quantity: quantity,
+            price: price,
+          },
+        ],
+      });
+
+      console.log(createCart);
+      res.json({ msg: true });
+    }
+  } catch (err) {
+    console.log(err);
+    res.json({ msg: false });
+  }
+});
+
+app.post("/viewCart", async (req, res) => {
+  const { _id } = req.body;
+  const data = await Cart.findOne({ _id: _id });
+  if (data) {
+    res.json(data);
+  } else {
+    res.json(false);
   }
 });
 
