@@ -327,6 +327,38 @@ app.post("/viewCart", async (req, res) => {
   }
 });
 
+app.post("/deleteCartItem", async (req, res) => {
+  const { _id, productId } = req.body;
+  console.log(typeof _id);
+  try {
+    const deleteItem = await Cart.findOneAndUpdate(
+      { _id: _id },
+      {
+        $pull: { productDetails: { productId } },
+      }
+    );
+    console.log(deleteItem);
+    res.json({ msg: true });
+  } catch (err) {
+    console.log(err);
+    res.json({ msg: false });
+  }
+});
+
+app.post("/updateCart", async (req, res) => {
+  const { _id, productDetails } = req.body;
+  try {
+    const update = await Cart.findOneAndReplace(
+      { _id: _id },
+      { productDetails: productDetails }
+    );
+    console.log(update);
+    res.json({ msg: true });
+  } catch (err) {
+    res.json({ msg: false });
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server is up on port 3001");
 });
