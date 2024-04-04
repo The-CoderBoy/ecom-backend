@@ -24,7 +24,7 @@ async function main() {
   console.log("database connnected");
 }
 
-const { Product, Banner, User, Cart } = require("./db/db");
+const { Product, Banner, User, Cart, Order } = require("./db/db");
 
 //---------------Routes------------------
 
@@ -268,12 +268,13 @@ app.post("/addToCart", async (req, res) => {
     const cart = await Cart.findOne({ _id: userName });
     if (cart) {
       const isItemPresent = await Cart.findOne({
+        _id: userName,
         "productDetails.productId": productId,
       });
 
       if (isItemPresent) {
         const updateCart = await Cart.findOneAndUpdate(
-          { "productDetails.productId": productId },
+          { _id: userName, "productDetails.productId": productId },
           { $set: { "productDetails.$.quantity": quantity } }
         );
         res.json({ msg: true });
@@ -355,6 +356,41 @@ app.post("/updateCart", async (req, res) => {
     console.log(update);
     res.json({ msg: true });
   } catch (err) {
+    res.json({ msg: false });
+  }
+});
+
+app.post("/orderFromCart", async (req, res) => {
+  const { userName, data } = req.body;
+  let orderData = [];
+  try {
+    const userData = await User.findOne({ userName: userName });
+
+    if (userData) {
+      for (let x = 0; x < data.length; x++) {
+        orderData.push({
+          userName: userName,
+          address: userData.address,
+          contactNo: userData.contactNo,
+          productId: data[x].productId,
+          productName: data[x].productName,
+          price: data[x].price,
+          quantity: data[x].quantity,
+          orderStatus: "pending",
+        });
+      }
+
+      const takeOrder = await Order.insertMany(orderData);
+
+      const emptyCart = await Cart.findOneAndUpdate(
+        { _id: userName },
+        { $set: { productDetails: [] } }
+      );
+
+      res.json({ msg: true });
+    }
+  } catch (err) {
+    console.log(err);
     res.json({ msg: false });
   }
 });

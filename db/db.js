@@ -32,9 +32,21 @@ const cart = new mongoose.Schema({
   ],
 });
 
+const order = new mongoose.Schema({
+  userName: String,
+  address: String,
+  contactNo: String,
+  productId: String,
+  productName: String,
+  price: String,
+  quantity: String,
+  orderStatus: String,
+});
+
 const Product = mongoose.model("Product", product);
 const Banner = mongoose.model("Banner", banner);
 const User = mongoose.model("User", user);
 const Cart = mongoose.model("Cart", cart);
+const Order = mongoose.model("Order", order);
 
-module.exports = { Product, Banner, User, Cart };
+module.exports = { Product, Banner, User, Cart, Order };
