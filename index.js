@@ -395,6 +395,31 @@ app.post("/orderFromCart", async (req, res) => {
   }
 });
 
+app.post("/buyNow", async (req, res) => {
+  const { userName, productId, productName, price, quantity } = req.body;
+
+  try {
+    const userData = await User.findOne({ userName: userName });
+    console.log(userData);
+    const order = await Order.create({
+      userName: userName,
+      address: userData.address,
+      contactNo: userData.contactNo,
+      productId: productId,
+      productName: productName,
+      price: price,
+      quantity: quantity,
+      orderStatus: "Pending",
+    });
+
+    console.log(order);
+    res.json({ msg: true });
+  } catch (err) {
+    console.log(err);
+    res.json({ msg: false });
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server is up on port 3001");
 });
