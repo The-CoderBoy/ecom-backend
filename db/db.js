@@ -41,6 +41,7 @@ const order = new mongoose.Schema({
   price: String,
   quantity: String,
   orderStatus: String,
+  date: String,
 });
 
 const Product = mongoose.model("Product", product);

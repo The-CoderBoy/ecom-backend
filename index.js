@@ -363,6 +363,13 @@ app.post("/updateCart", async (req, res) => {
 app.post("/orderFromCart", async (req, res) => {
   const { userName, data } = req.body;
   let orderData = [];
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, "0");
+  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  var yyyy = today.getFullYear();
+
+  today = mm + "/" + dd + "/" + yyyy;
+
   try {
     const userData = await User.findOne({ userName: userName });
 
@@ -377,6 +384,7 @@ app.post("/orderFromCart", async (req, res) => {
           price: data[x].price,
           quantity: data[x].quantity,
           orderStatus: "pending",
+          date: today,
         });
       }
 
@@ -398,6 +406,13 @@ app.post("/orderFromCart", async (req, res) => {
 app.post("/buyNow", async (req, res) => {
   const { userName, productId, productName, price, quantity } = req.body;
 
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, "0");
+  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  var yyyy = today.getFullYear();
+
+  today = mm + "/" + dd + "/" + yyyy;
+
   try {
     const userData = await User.findOne({ userName: userName });
     console.log(userData);
@@ -410,12 +425,37 @@ app.post("/buyNow", async (req, res) => {
       price: price,
       quantity: quantity,
       orderStatus: "Pending",
+      date: today,
     });
 
     console.log(order);
     res.json({ msg: true });
   } catch (err) {
     console.log(err);
+    res.json({ msg: false });
+  }
+});
+
+app.post("/viewOrder", async (req, res) => {
+  try {
+    const data = await Order.find({});
+    console.log(data);
+    res.json(data);
+  } catch (err) {
+    res.json(false);
+  }
+});
+
+app.post("/updateOrder", async (req, res) => {
+  const { _id, orderStatus } = req.body;
+  try {
+    const updata = await Order.findOneAndUpdate(
+      { _id: _id },
+      { $set: { orderStatus: orderStatus } }
+    );
+    console.log(updata);
+    res.json({ msg: true });
+  } catch (err) {
     res.json({ msg: false });
   }
 });
