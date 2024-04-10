@@ -460,6 +460,18 @@ app.post("/updateOrder", async (req, res) => {
   }
 });
 
+app.post("/viewUserOrder", async (req, res) => {
+  const { _id } = req.body;
+  try {
+    const data = await Order.find({ userName: _id });
+    console.log(data);
+    res.json(data);
+  } catch (err) {
+    console.log(err);
+    res.json(false);
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server is up on port 3001");
 });
