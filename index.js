@@ -472,6 +472,20 @@ app.post("/viewUserOrder", async (req, res) => {
   }
 });
 
+app.post("/searchProduct", async (req, res) => {
+  const { product } = req.body;
+
+  const search = new RegExp(product);
+
+  try {
+    const data = await Product.find({ "product name": { $regex: search } });
+    res.json(data);
+  } catch (err) {
+    console.log(err);
+    res.json(false);
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server is up on port 3001");
 });
